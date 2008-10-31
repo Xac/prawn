@@ -23,7 +23,7 @@ module Prawn
     include Text                             
     include PageGeometry                             
     
-    attr_accessor :y, :margin_box
+    attr_accessor :y, :margin_box, :header_content
     attr_reader   :margins, :page_size, :page_layout
       
     # Creates and renders a PDF document. 
@@ -132,8 +132,19 @@ module Prawn
      
        add_content "q"   
        
-       @y = @bounding_box.absolute_top        
+       @y = @bounding_box.absolute_top   
+       
+       @header_content.each { |c| c.call } if @header_content
     end             
+    
+    def add_header_content(&content)
+      (@header_content ||= []).push content
+      return @header_content.length-1 # Array index of new content
+    end
+
+    def remove_header_content(index)
+      @header_content.delete_at(index)
+    end
       
     # Returns the number of pages in the document
     #  

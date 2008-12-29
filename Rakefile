@@ -4,7 +4,7 @@ require 'rake/testtask'
 require "rake/rdoctask"
 require "rake/gempackagetask"  
 
-PRAWN_VERSION = "0.2.99" 
+PRAWN_VERSION = "0.3.99" 
 
 task :default => [:test]
        
@@ -26,7 +26,8 @@ desc "genrates documentation"
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include( "README",
                            "COPYING",
-                           "LICENSE", "lib/" )
+                           "LICENSE", 
+                           "HACKING", "lib/" )
   rdoc.main     = "README"
   rdoc.rdoc_dir = "doc/html"
   rdoc.title    = "Prawn Documentation"
@@ -35,22 +36,12 @@ end
 desc "run all examples, and then diff them against reference PDFs"
 task :examples do 
   mkdir_p "output"
-  examples = Dir["examples/*.rb"]
+  examples = Dir["examples/**/*.rb"]
   t = Time.now
   puts "Running Examples"
   examples.each { |file| `ruby -Ilib #{file}` }  
   puts "Ran in #{Time.now - t} s"        
   `mv *.pdf output`                     
-                   
-  unless RUBY_VERSION < "1.9"    
-    puts "Checking for differences..."
-    output = Dir["output/*.pdf"]
-    ref    = Dir["reference_pdfs/*.pdf"]   
-    output.zip(ref).each do |o,r|
-      system "diff -q #{o} #{r}"
-    end                      
-  end
-
 end
 
 spec = Gem::Specification.new do |spec|
